@@ -1,0 +1,54 @@
+version: "3.5"
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - .:/work
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.gnupg:/root/.gnupg
+
+    working_dir: /work
+    networks:
+      - default
+    ports:
+      - "5678:5678"
+      - "9678:9678"
+      - "9876:9876"
+      - "9757:9757"
+    depends_on:
+      - db
+    command: sleep infinity
+
+  db:
+    image: postgres:12
+    working_dir: /
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+      - ./data:/data
+    environment:
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "6543:5432"
+    restart: unless-stopped
+    networks:
+      - default
+    command:
+      postgres -c logging_collector=on -c log_destination=stderr -c
+      log_directory=/var/lib/postgresql/data/logs -c log_rotation_age=60 -c
+      log_truncate_on_rotation=on -c log_filename=server_log.hour.%H%M
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      - PGADMIN_LISTEN_PORT=8080
+      - PGADMIN_DEFAULT_EMAIL=lukas@statuscode.ch
+      - PGADMIN_DEFAULT_PASSWORD=password
+
+volumes:
+  db-volume:

@@ -1,0 +1,9 @@
+{
+    "name": "Node.js & Postgres",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "server",
+    "workspaceFolder": "/work",
+    "extensions": [
+        "ms-azuretools.vscode-docker"
+    ]
+}
