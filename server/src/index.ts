@@ -5,14 +5,16 @@ const app = express();
 
 app.use(
   postgraphile(
-    "postgres://postgres:password@db:5432/postgres",
+    "postgres://permissionhub_postgraphile:password@db:5432/postgres",
     "app_public",
     {
       subscriptions: true,
       watchPg: true,
       dynamicJson: true,
       setofFunctionsContainNulls: false,
+      ownerConnectionString: "postgres://postgres:password@db:5432/postgres",
       ignoreRBAC: false,
+      pgDefaultRole: "permissionhub_admin",
       showErrorStack: "json",
       extendedErrors: ["hint", "detail", "errcode"],
       appendPlugins: [require("@graphile-contrib/pg-simplify-inflector")],
@@ -28,4 +30,4 @@ app.use(
   )
 );
 
-app.listen(3000);
+app.listen(3001);
