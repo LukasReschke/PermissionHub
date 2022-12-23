@@ -1,15 +1,15 @@
-import { Link } from "@cloudscape-design/components";
+import { Link, SideNavigationProps } from "@cloudscape-design/components";
 import AppLayout from "@cloudscape-design/components/app-layout";
 import Box from "@cloudscape-design/components/box";
 import Button from "@cloudscape-design/components/button";
 import Header from "@cloudscape-design/components/header";
 import HelpPanel from "@cloudscape-design/components/help-panel";
-import SideNavigation, { SideNavigationProps } from "@cloudscape-design/components/side-navigation";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import Table from "@cloudscape-design/components/table";
 import { Router } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import BreadcrumbGroup from "../../../components/BreadcrumbGroup";
+import SideNavigation from "../../../components/SideNavigation";
 
 const columnDefinitions: [] = [
 
@@ -79,7 +79,7 @@ type Props = {
 export default function PermissionDomainsPage({ navItems }: Props) {
     return <AppLayout
         toolsHide
-        navigation={<SideNavigation activeHref="#/pages" items={navItems} />}
+        navigation={<SideNavigation items={navItems} />}
         breadcrumbs={<BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />}
         contentType="table"
         content={<Content />}

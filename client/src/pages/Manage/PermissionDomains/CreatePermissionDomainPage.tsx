@@ -7,11 +7,12 @@ import FormField from "@cloudscape-design/components/form-field";
 import Header from "@cloudscape-design/components/header";
 import Input from "@cloudscape-design/components/input";
 import Link from "@cloudscape-design/components/link";
-import SideNavigation, { SideNavigationProps } from "@cloudscape-design/components/side-navigation";
+import { SideNavigationProps } from "@cloudscape-design/components/side-navigation";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BreadcrumbGroup from "../../../components/BreadcrumbGroup";
+import SideNavigation from "../../../components/SideNavigation";
 
 const breadcrumbs = [
     {
@@ -27,7 +28,7 @@ const breadcrumbs = [
         href: '/manage/permissiondomains',
     },
     {
-        text: 'Create Permission Domain',
+        text: 'Create permission domain',
         href: '/manage/permissiondomains/create',
     },
 ];
@@ -51,7 +52,7 @@ export default function CreatePermissionDomainPage({ navItems }: Props) {
 
     return <AppLayout
         toolsHide
-        navigation={<SideNavigation activeHref="#/pages" items={navItems} />}
+        navigation={<SideNavigation activeHref="/manage/permissiondomains" items={navItems} />}
         breadcrumbs={<BreadcrumbGroup items={breadcrumbs} expandAriaLabel="Show path" ariaLabel="Breadcrumbs" />}
         contentType="form"
         content={
