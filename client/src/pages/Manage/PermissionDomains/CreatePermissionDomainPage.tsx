@@ -11,8 +11,10 @@ import { SideNavigationProps } from "@cloudscape-design/components/side-navigati
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "urql";
 import BreadcrumbGroup from "../../../components/BreadcrumbGroup";
 import SideNavigation from "../../../components/SideNavigation";
+import { graphql } from "../../../gql";
 
 const breadcrumbs = [
     {
@@ -37,14 +39,34 @@ type Props = {
     navItems: SideNavigationProps.Item[],
 }
 
+const createPermissionDomain = graphql(`mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {
+    createPermissionDomain(input:$data) {
+      permissionDomain {
+        id
+      }
+    }
+}`);
+
 export default function CreatePermissionDomainPage({ navItems }: Props) {
     let navigate = useNavigate();
+    const [writeInAction, setWriteInAction] = useState(false);
+    const [createPermissionResult, createPermission] = useMutation(createPermissionDomain);
+
     let handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        setWriteInAction(true);
         e.preventDefault();
         if (permissionDomainName.length == 0) {
             setErrorMessage("Permission Domain Name is required.");
         } else {
-            setErrorMessage("");
+            createPermission({ data: { permissionDomain: { name: permissionDomainName } } }).then((result) => {
+                if (result.error) {
+                    setErrorMessage("Something went wrong.");
+                } else {
+                    setErrorMessage("");
+                    navigate("/manage/permissiondomains");
+                }
+                setWriteInAction(false);
+            });
         }
     };
     const [errorMessage, setErrorMessage] = useState("");
@@ -70,10 +92,10 @@ export default function CreatePermissionDomainPage({ navItems }: Props) {
                             <SpaceBetween direction="horizontal" size="xs">
                                 <Button
                                     variant="link"
-                                    onClick={(e) => {e.preventDefault(); navigate(-1)}}>
+                                    onClick={(e) => { e.preventDefault(); navigate(-1) }}>
                                     Cancel
                                 </Button>
-                                <Button variant="primary">Create permission domain</Button>
+                                <Button variant="primary" loading={writeInAction} disabled={writeInAction}>Create permission domain</Button>
                             </SpaceBetween>
                         }
                         errorIconAriaLabel="Error"
@@ -85,7 +107,6 @@ export default function CreatePermissionDomainPage({ navItems }: Props) {
                                 <FormField
                                     label="Permission Domain Name"
                                     errorText={errorMessage}
-                                    constraintText
                                     description="Enter the unique name of this permission domain.">
                                     <Input
                                         ariaRequired={true}
