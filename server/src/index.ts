@@ -9,6 +9,7 @@ app.use(
     "app_public",
     {
       subscriptions: true,
+      enableCors: true,
       watchPg: true,
       dynamicJson: true,
       setofFunctionsContainNulls: false,
