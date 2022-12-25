@@ -17,6 +17,35 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
+  """Reads and enables pagination through a set of `Permission`."""
+  permissions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Permission`."""
+    orderBy: [PermissionsOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PermissionCondition
+  ): PermissionsConnection
+
   """Reads and enables pagination through a set of `PermissionDomain`."""
   permissionDomains(
     """Only read the first `n` values of the set."""
@@ -45,6 +74,7 @@ type Query implements Node {
     """
     condition: PermissionDomainCondition
   ): PermissionDomainsConnection
+  permissionById(id: Int!): Permission
   permissionDomain(id: Int!): PermissionDomain
   permissionDomainByName(name: String!): PermissionDomain
 
@@ -63,6 +93,130 @@ interface Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+}
+
+"""A connection to a list of `Permission` values."""
+type PermissionsConnection {
+  """A list of `Permission` objects."""
+  nodes: [Permission!]!
+
+  """
+  A list of edges which contains the `Permission` and cursor to aid in pagination.
+  """
+  edges: [PermissionsEdge!]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Permission` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Permission {
+  id: Int!
+  name: String!
+  permissionDomainId: Int!
+
+  """
+  Reads a single `PermissionDomain` that is related to this `Permission`.
+  """
+  permissionDomain: PermissionDomain
+}
+
+"""A permission domain includes all permissions for a given service."""
+type PermissionDomain implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Unique ID of the permission domain"""
+  id: Int!
+
+  """Unique name of the permission domain"""
+  name: String!
+
+  """Reads and enables pagination through a set of `Permission`."""
+  permissions(
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering `Permission`."""
+    orderBy: [PermissionsOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PermissionCondition
+  ): PermissionsConnection!
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Methods to use when ordering `Permission`."""
+enum PermissionsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  PERMISSION_DOMAIN_ID_ASC
+  PERMISSION_DOMAIN_ID_DESC
+}
+
+"""
+A condition to be used against `Permission` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input PermissionCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `permissionDomainId` field."""
+  permissionDomainId: Int
+}
+
+"""A `Permission` edge in the connection."""
+type PermissionsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Permission` at the end of the edge."""
+  node: Permission!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
 }
 
 """A connection to a list of `PermissionDomain` values."""
@@ -84,20 +238,6 @@ type PermissionDomainsConnection {
   totalCount: Int!
 }
 
-"""A permission domain includes all permissions for a given service."""
-type PermissionDomain implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-
-  """Unique ID of the permission domain"""
-  id: Int!
-
-  """Unique name of the permission domain"""
-  name: String!
-}
-
 """A `PermissionDomain` edge in the connection."""
 type PermissionDomainsEdge {
   """A cursor for use in pagination."""
@@ -105,24 +245,6 @@ type PermissionDomainsEdge {
 
   """The `PermissionDomain` at the end of the edge."""
   node: PermissionDomain!
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
 }
 
 """Methods to use when ordering `PermissionDomain`."""
@@ -152,6 +274,14 @@ input PermissionDomainCondition {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
+  """Creates a single `Permission`."""
+  createPermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePermissionInput!
+  ): CreatePermissionPayload
+
   """Creates a single `PermissionDomain`."""
   createPermissionDomain(
     """
@@ -159,6 +289,68 @@ type Mutation {
     """
     input: CreatePermissionDomainInput!
   ): CreatePermissionDomainPayload
+
+  """Updates a single `Permission` using a unique key and a patch."""
+  updatePermissionById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePermissionByIdInput!
+  ): UpdatePermissionPayload
+
+  """Deletes a single `Permission` using a unique key."""
+  deletePermissionById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePermissionByIdInput!
+  ): DeletePermissionPayload
+}
+
+"""The output of our create `Permission` mutation."""
+type CreatePermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Permission` that was created by this mutation."""
+  permission: Permission
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `PermissionDomain` that is related to this `Permission`.
+  """
+  permissionDomain: PermissionDomain
+
+  """An edge for our `Permission`. May be used by Relay 1."""
+  permissionEdge(
+    """The method to use when ordering `Permission`."""
+    orderBy: [PermissionsOrderBy!] = [NATURAL]
+  ): PermissionsEdge
+}
+
+"""All input for the create `Permission` mutation."""
+input CreatePermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Permission` to be created by this mutation."""
+  permission: PermissionInput!
+}
+
+"""An input for mutations affecting `Permission`"""
+input PermissionInput {
+  name: String!
+  permissionDomainId: Int!
 }
 
 """The output of our create `PermissionDomain` mutation."""
@@ -200,4 +392,95 @@ input CreatePermissionDomainInput {
 input PermissionDomainInput {
   """Unique name of the permission domain"""
   name: String!
+}
+
+"""The output of our update `Permission` mutation."""
+type UpdatePermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Permission` that was updated by this mutation."""
+  permission: Permission
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `PermissionDomain` that is related to this `Permission`.
+  """
+  permissionDomain: PermissionDomain
+
+  """An edge for our `Permission`. May be used by Relay 1."""
+  permissionEdge(
+    """The method to use when ordering `Permission`."""
+    orderBy: [PermissionsOrderBy!] = [NATURAL]
+  ): PermissionsEdge
+}
+
+"""All input for the `updatePermissionById` mutation."""
+input UpdatePermissionByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Permission` being updated.
+  """
+  patch: PermissionPatch!
+  id: Int!
+}
+
+"""
+Represents an update to a `Permission`. Fields that are set will be updated.
+"""
+input PermissionPatch {
+  id: Int
+  name: String
+  permissionDomainId: Int
+}
+
+"""The output of our delete `Permission` mutation."""
+type DeletePermissionPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Permission` that was deleted by this mutation."""
+  permission: Permission
+  deletedPermissionNodeId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `PermissionDomain` that is related to this `Permission`.
+  """
+  permissionDomain: PermissionDomain
+
+  """An edge for our `Permission`. May be used by Relay 1."""
+  permissionEdge(
+    """The method to use when ordering `Permission`."""
+    orderBy: [PermissionsOrderBy!] = [NATURAL]
+  ): PermissionsEdge
+}
+
+"""All input for the `deletePermissionById` mutation."""
+input DeletePermissionByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
 }
