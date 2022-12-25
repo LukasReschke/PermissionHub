@@ -9,6 +9,12 @@ const config: CodegenConfig = {
       preset: 'client',
       plugins: ['typescript-urql-graphcache'],
     },
+    './src/generated-introspection.tsx': {
+      plugins: ['urql-introspection'],
+      config: {
+        minify: true
+      },
+    }
   },
 };
 
