@@ -1,6 +1,6 @@
 import { LinkProps } from "@cloudscape-design/components/link/interfaces";
 import { Link as LinkOriginal } from "@cloudscape-design/components";
-import { useNavigate } from "react-router/dist/lib/hooks";
+import { useNavigate } from "react-router-dom";
 
 export default function Link({ ...props }: LinkProps) {
     const navigate = useNavigate();
