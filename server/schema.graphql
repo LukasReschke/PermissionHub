@@ -305,6 +305,30 @@ type Mutation {
     """
     input: DeletePermissionByIdInput!
   ): DeletePermissionPayload
+
+  """Deletes a single `PermissionDomain` using its globally unique id."""
+  deletePermissionDomainByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePermissionDomainByNodeIdInput!
+  ): DeletePermissionDomainPayload
+
+  """Deletes a single `PermissionDomain` using a unique key."""
+  deletePermissionDomain(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePermissionDomainInput!
+  ): DeletePermissionDomainPayload
+
+  """Deletes a single `PermissionDomain` using a unique key."""
+  deletePermissionDomainByName(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePermissionDomainByNameInput!
+  ): DeletePermissionDomainPayload
 }
 
 """The output of our create `Permission` mutation."""
@@ -483,4 +507,66 @@ input DeletePermissionByIdInput {
   """
   clientMutationId: String
   id: Int!
+}
+
+"""The output of our delete `PermissionDomain` mutation."""
+type DeletePermissionDomainPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `PermissionDomain` that was deleted by this mutation."""
+  permissionDomain: PermissionDomain
+  deletedPermissionDomainNodeId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our `PermissionDomain`. May be used by Relay 1."""
+  permissionDomainEdge(
+    """The method to use when ordering `PermissionDomain`."""
+    orderBy: [PermissionDomainsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PermissionDomainsEdge
+}
+
+"""All input for the `deletePermissionDomainByNodeId` mutation."""
+input DeletePermissionDomainByNodeIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `PermissionDomain` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the `deletePermissionDomain` mutation."""
+input DeletePermissionDomainInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique ID of the permission domain"""
+  id: Int!
+}
+
+"""All input for the `deletePermissionDomainByName` mutation."""
+input DeletePermissionDomainByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique name of the permission domain"""
+  name: String!
 }
