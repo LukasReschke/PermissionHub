@@ -13,23 +13,23 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel-plugin for production.
  */
 const documents = {
-    "mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {\n    createPermissionDomain(input:$data) {\n      permissionDomain {\n        id\n      }\n    }\n}": types.AddNewPermissionDomainDocument,
-    "\nquery FetchAllPermissionDomains {\n    permissionDomains {\n      nodes {\n        id\n        rowId\n        name\n      }\n    }\n  }\n": types.FetchAllPermissionDomainsDocument,
-    "\nmutation DeletePermissionDomainByIdMutation($id:ID!){\n    deletePermissionDomainById(input: { id: $id }) {\n      deletedPermissionDomainId\n    }\n  }\n": types.DeletePermissionDomainByIdMutationDocument,
+    "mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {\n    createPermissionDomain(input:$data) {\n      permissionDomain {\n        id\n        name\n      }\n    }\n}": types.AddNewPermissionDomainDocument,
+    "\nquery FetchAllPermissionDomains {\n    permissionDomains {\n      nodes {\n        id\n        name\n      }\n    }\n  }\n": types.FetchAllPermissionDomainsDocument,
+    "\nmutation DeletePermissionDomainByIdMutation($id: ID!) {\n    deletePermissionDomainById(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n": types.DeletePermissionDomainByIdMutationDocument,
 };
 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {\n    createPermissionDomain(input:$data) {\n      permissionDomain {\n        id\n      }\n    }\n}"): (typeof documents)["mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {\n    createPermissionDomain(input:$data) {\n      permissionDomain {\n        id\n      }\n    }\n}"];
+export function graphql(source: "mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {\n    createPermissionDomain(input:$data) {\n      permissionDomain {\n        id\n        name\n      }\n    }\n}"): (typeof documents)["mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {\n    createPermissionDomain(input:$data) {\n      permissionDomain {\n        id\n        name\n      }\n    }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\nquery FetchAllPermissionDomains {\n    permissionDomains {\n      nodes {\n        id\n        rowId\n        name\n      }\n    }\n  }\n"): (typeof documents)["\nquery FetchAllPermissionDomains {\n    permissionDomains {\n      nodes {\n        id\n        rowId\n        name\n      }\n    }\n  }\n"];
+export function graphql(source: "\nquery FetchAllPermissionDomains {\n    permissionDomains {\n      nodes {\n        id\n        name\n      }\n    }\n  }\n"): (typeof documents)["\nquery FetchAllPermissionDomains {\n    permissionDomains {\n      nodes {\n        id\n        name\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\nmutation DeletePermissionDomainByIdMutation($id:ID!){\n    deletePermissionDomainById(input: { id: $id }) {\n      deletedPermissionDomainId\n    }\n  }\n"): (typeof documents)["\nmutation DeletePermissionDomainByIdMutation($id:ID!){\n    deletePermissionDomainById(input: { id: $id }) {\n      deletedPermissionDomainId\n    }\n  }\n"];
+export function graphql(source: "\nmutation DeletePermissionDomainByIdMutation($id: ID!) {\n    deletePermissionDomainById(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n"): (typeof documents)["\nmutation DeletePermissionDomainByIdMutation($id: ID!) {\n    deletePermissionDomainById(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n"];
 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.

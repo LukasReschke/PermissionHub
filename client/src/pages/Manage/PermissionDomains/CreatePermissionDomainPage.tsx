@@ -39,10 +39,11 @@ type Props = {
     navItems: SideNavigationProps.Item[],
 }
 
-const createPermissionDomain = graphql(`mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {
+const createPermissionDomainMutation = graphql(`mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {
     createPermissionDomain(input:$data) {
       permissionDomain {
         id
+        name
       }
     }
 }`);
@@ -50,12 +51,12 @@ const createPermissionDomain = graphql(`mutation AddNewPermissionDomain($data:Cr
 export default function CreatePermissionDomainPage({ navItems }: Props) {
     let navigate = useNavigate();
     const [writeInAction, setWriteInAction] = useState(false);
-    const [createPermissionResult, createPermission] = useMutation(createPermissionDomain);
+    const [createPermissionResult, createPermission] = useMutation(createPermissionDomainMutation);
 
     let handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         setWriteInAction(true);
         e.preventDefault();
-        if (permissionDomainName.length == 0) {
+        if (permissionDomainName.length === 0) {
             setErrorMessage("Permission Domain Name is required.");
         } else {
             createPermission({ data: { permissionDomain: { name: permissionDomainName } } }).then((result) => {

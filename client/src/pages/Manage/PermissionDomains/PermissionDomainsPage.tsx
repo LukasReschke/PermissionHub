@@ -1,4 +1,4 @@
-import { CollectionPreferences, CollectionPreferencesProps, Pagination, SideNavigationProps, TextFilter } from "@cloudscape-design/components";
+import { Alert, CollectionPreferences, CollectionPreferencesProps, ColumnLayout, FormField, Input, Modal, Pagination, SideNavigationProps, TextFilter } from "@cloudscape-design/components";
 import AppLayout from "@cloudscape-design/components/app-layout";
 import Box from "@cloudscape-design/components/box";
 import Button from "@cloudscape-design/components/button";
@@ -8,17 +8,16 @@ import Table, { TableProps } from "@cloudscape-design/components/table";
 import { useNavigate } from "react-router-dom";
 import BreadcrumbGroup from "../../../components/BreadcrumbGroup";
 import SideNavigation from "../../../components/SideNavigation";
-import { useQuery } from 'urql';
+import { useMutation, useQuery } from 'urql';
 import { graphql } from '../../../gql';
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "../../../components/Link";
+import { FetchAllPermissionDomainsQuery } from "../../../gql/graphql";
 
-const columnDefinitions: TableProps.ColumnDefinition<{ __typename?: "PermissionDomain" | undefined; id: number; name: string; }>[] = [
-    {
-        header: "ID",
-        cell: e => e.id,
-        sortingField: "id",
-    },
+type PermissionDomainsQueryResponse = NonNullable<FetchAllPermissionDomainsQuery['permissionDomains']>['nodes'][0][];
+
+const columnDefinitions: TableProps.ColumnDefinition<PermissionDomainsQueryResponse[0]>[] = [
     {
         header: "Name",
         cell: e => e.name,
@@ -26,12 +25,23 @@ const columnDefinitions: TableProps.ColumnDefinition<{ __typename?: "PermissionD
     },
 ];
 
-const PermissionDomainsQuery = graphql(`
+export const PermissionDomainsQuery = graphql(`
 query FetchAllPermissionDomains {
     permissionDomains {
       nodes {
         id
         name
+      }
+    }
+  }
+`);
+
+const DeletePermissionDomainMutation = graphql(`
+mutation DeletePermissionDomainByIdMutation($id: ID!) {
+    deletePermissionDomainById(input: {id: $id}) {
+      permissionDomain {
+        __typename
+        id
       }
     }
   }
@@ -64,14 +74,127 @@ const PAGE_SIZE_OPTIONS: CollectionPreferencesProps.PageSizeOption[] = [
     { value: 50, label: '50 permission domains' },
 ];
 
+type DeleteModalProps = {
+    instances: PermissionDomainsQueryResponse,
+    visible: boolean;
+    onDiscard: () => void;
+    onDelete: () => void;
+};
+
+function DeleteModal({ instances, visible, onDiscard, onDelete }: DeleteModalProps) {
+    const deleteConsentText = 'confirm';
+
+    const [deleteInputText, setDeleteInputText] = useState('');
+    useEffect(() => {
+        setDeleteInputText('');
+    }, [visible]);
+
+    const handleDeleteSubmit = (event: { preventDefault: () => void; }) => {
+        event.preventDefault();
+        if (inputMatchesConsentText) {
+            onDelete();
+        }
+    };
+
+    const inputMatchesConsentText = deleteInputText.toLowerCase() === deleteConsentText;
+
+    const isMultiple = instances.length > 1;
+    return (
+        <Modal
+            visible={visible}
+            onDismiss={onDiscard}
+            header={isMultiple ? 'Delete permission domains' : 'Delete permission domain'}
+            closeAriaLabel="Close dialog"
+            footer={
+                <Box float="right">
+                    <SpaceBetween direction="horizontal" size="xs">
+                        <Button variant="link" onClick={onDiscard}>
+                            Cancel
+                        </Button>
+                        <Button variant="primary" onClick={onDelete} disabled={!inputMatchesConsentText}>
+                            Delete
+                        </Button>
+                    </SpaceBetween>
+                </Box>
+            }
+        >
+            {instances.length > 0 && (
+                <SpaceBetween size="m">
+                    {isMultiple ? (
+                        <Box variant="span">
+                            Delete{' '}
+                            <Box variant="span" fontWeight="bold">
+                                {instances.length} permission domains
+                            </Box>{' '}
+                            permanently? This action cannot be undone.
+                        </Box>
+                    ) : (
+                        <Box variant="span">
+                            Delete permission domain{' '}
+                            <Box variant="span" fontWeight="bold">
+                                {instances[0].name}
+                            </Box>{' '}
+                            permanently? This action cannot be undone.
+                        </Box>
+                    )}
+
+                    <Alert type="warning" statusIconAriaLabel="Warning">
+                        Proceeding with this action will delete permission domains with all content and can impact related resources.{' '}
+                        <Link external={true} href="#">
+                            Learn more
+                        </Link>
+                    </Alert>
+
+                    <Box>To avoid accidental deletions we ask you to provide additional written consent.</Box>
+
+                    <ColumnLayout columns={2}>
+                        <form onSubmit={handleDeleteSubmit}>
+                            <FormField label={`Type "${deleteConsentText}" to agree.`}>
+                                <Input
+                                    placeholder={deleteConsentText}
+                                    onChange={event => setDeleteInputText(event.detail.value)}
+                                    value={deleteInputText}
+                                    ariaRequired={true}
+                                />
+                            </FormField>
+                        </form>
+                    </ColumnLayout>
+                </SpaceBetween>
+            )}
+        </Modal>
+    );
+}
+
+
 const Content = () => {
+    const [deletePermissionDomainResult, deletePermissionDomain] = useMutation(DeletePermissionDomainMutation);
+
     let navigate = useNavigate();
     const [result, reexecuteQuery] = useQuery({
         query: PermissionDomainsQuery
     });
     const [preferences, setPreferences] = useState<CollectionPreferencesProps.Preferences>({ pageSize: 10, visibleContent: ['id', 'name'] });
+    const [permissionDomains, setPermissionDomains] = useState<PermissionDomainsQueryResponse>([]);
+    useEffect(() => {
+        setPermissionDomains(result.data?.permissionDomains?.nodes ?? []);
+    }, [result]);
 
-    let nodes = result.data?.permissionDomains?.nodes || [];
+    const [selectedItems, setSelectedItems] = useState<PermissionDomainsQueryResponse>([]);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const onDeleteInit = () => setShowDeleteModal(true);
+    const onDeleteDiscard = () => setShowDeleteModal(false);
+    const onDeleteConfirm = () => {
+        selectedItems.forEach(element => {
+            deletePermissionDomain({ id: element.id }).then((result) => {
+             
+            });
+        });
+
+        setSelectedItems([]);
+        setShowDeleteModal(false);
+    };
+
+    let nodes = permissionDomains || [];
     const {
         items,
         actions,
@@ -102,10 +225,10 @@ const Content = () => {
         sorting: {},
         selection: {},
     });
-    let isOnlyOneSelected = collectionProps.selectedItems?.length === 1 || false; 
+    let isOnlyOneSelected = selectedItems.length === 1 || false;
 
     return (
-        <Table
+        <><Table
             {...collectionProps}
             selectionType="multi"
             stripedRows={preferences.stripedRows}
@@ -117,12 +240,12 @@ const Content = () => {
             variant="full-page"
             header={
                 <Header
-                    counter={"(" + (collectionProps.selectedItems?.length || 0) + " of " + nodes.length.toString() + ")"}
+                    counter={"(" + (selectedItems.length || 0) + " of " + nodes.length.toString() + ")"}
                     actions={
                         <SpaceBetween size="xs" direction="horizontal">
                             <Button disabled={!isOnlyOneSelected}>View details</Button>
                             <Button disabled={!isOnlyOneSelected}>Edit</Button>
-                            <Button disabled={(collectionProps.selectedItems?.length || 0) === 0}>Delete</Button>
+                            <Button onClick={onDeleteInit} disabled={(selectedItems.length || 0) === 0}>Delete</Button>
                             <Button onClick={e => { e.preventDefault(); navigate("./create"); }} variant="primary">Create permission domain</Button>
                         </SpaceBetween>
                     }
@@ -160,7 +283,16 @@ const Content = () => {
             }
 
             stickyHeader={true}
+            selectedItems={selectedItems}
+            onSelectionChange={event => setSelectedItems(event.detail.selectedItems)}
         />
+            <DeleteModal
+                visible={showDeleteModal}
+                onDiscard={onDeleteDiscard}
+                onDelete={onDeleteConfirm}
+                instances={selectedItems}
+            />
+        </>
     );
 };
 
