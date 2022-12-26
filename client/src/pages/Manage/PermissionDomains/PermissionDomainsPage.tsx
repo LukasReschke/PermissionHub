@@ -195,7 +195,7 @@ const Content = () => {
     };
     const navigateToSelectedPermissionDomain = () => {
         if (selectedItems.length === 1) {
-            navigate(`./${selectedItems[0].id}`);
+            navigate(`./${encodeURI(selectedItems[0].id)}`);
         }
     };
 
