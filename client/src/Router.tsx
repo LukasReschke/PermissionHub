@@ -1,5 +1,5 @@
 import "@cloudscape-design/global-styles/index.css"
-import { createBrowserRouter, createRoutesFromElements, Route, Routes } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import { MainLayout } from './components/MainLayout';
 import NoMatch from './pages/NoMatch';
 import PermissionDomainsPage from './pages/Manage/PermissionDomains/PermissionDomainsPage';
@@ -36,32 +36,28 @@ const navItems: SideNavigationProps.Item[] = [
     },*/
 ];
 
-export const router = createBrowserRouter(
-    createRoutesFromElements(
-        <Route path="/" element={<MainLayout />}>
-            <Route
-                path="/manage/permissiondomains"
-                element={
-                    <PermissionDomainsPage
-                        navItems={navItems} />
-                } />
-            <Route
-                path="/manage/permissiondomains/:permissionDomainId"
-                element={
-                    <PermissionsByDomainListPage
-                        navItems={navItems} />
-                } />
-            <Route
-                path="/manage/permissiondomains/create"
-                element={
-                    <CreatePermissionDomainPage
-                        navItems={navItems} />
-                } />
-            <Route
-                path="*"
-                element={
-                    <NoMatch />
-                } />
-        </Route>
-    )
-);
+export const router = createBrowserRouter([
+    {
+        
+        path: '/',
+        element: <MainLayout />,
+        children: [
+            {
+                path: '/manage/permissiondomains',
+                element: <PermissionDomainsPage navItems={navItems} />,
+            },
+            {
+                path: '/manage/permissiondomains/:permissionDomainId',
+                element: <PermissionsByDomainListPage navItems={navItems} />,
+            },
+            {
+                path: '/manage/permissiondomains/create',
+                element: <CreatePermissionDomainPage navItems={navItems} />,
+            },
+        ],
+    },
+    {
+        path: '*',
+        element: <NoMatch />,
+    },
+]);
