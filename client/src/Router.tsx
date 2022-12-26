@@ -46,7 +46,7 @@ export const router = createBrowserRouter([
                 element: <PermissionDomainsPage navItems={navItems} />,
             },
             {
-                path: '/manage/permissiondomains/:permissionDomainId',
+                path: '/manage/permissiondomains/:id',
                 element: <PermissionsByDomainListPage navItems={navItems} />,
             },
             {
