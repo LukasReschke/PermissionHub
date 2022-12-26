@@ -186,12 +186,17 @@ const Content = () => {
     const onDeleteConfirm = () => {
         selectedItems.forEach(element => {
             deletePermissionDomain({ id: element.id }).then((result) => {
-             
+
             });
         });
 
         setSelectedItems([]);
         setShowDeleteModal(false);
+    };
+    const navigateToSelectedPermissionDomain = () => {
+        if (selectedItems.length === 1) {
+            navigate(`./${selectedItems[0].id}`);
+        }
     };
 
     let nodes = permissionDomains || [];
@@ -243,7 +248,7 @@ const Content = () => {
                     counter={"(" + (selectedItems.length || 0) + " of " + nodes.length.toString() + ")"}
                     actions={
                         <SpaceBetween size="xs" direction="horizontal">
-                            {/*<Button disabled={!isOnlyOneSelected}>View details</Button>*/}
+                            <Button onClick={navigateToSelectedPermissionDomain} disabled={!isOnlyOneSelected}>View details</Button>
                             {/*<Button disabled={!isOnlyOneSelected}>Edit</Button */}
                             <Button onClick={onDeleteInit} disabled={(selectedItems.length || 0) === 0}>Delete</Button>
                             <Button onClick={e => { e.preventDefault(); navigate("./create"); }} variant="primary">Create permission domain</Button>
