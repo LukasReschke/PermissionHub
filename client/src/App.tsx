@@ -12,11 +12,11 @@ const navItems: SideNavigationProps.Item[] = [
     text: 'Manage',
     items: [
       { type: 'link', text: 'Permission Domains', href: '/manage/permissiondomains' },
-      { type: 'link', text: 'Permissions', href: '#/paaages' },
-      { type: 'link', text: 'Users', href: '#/users' },
+     // { type: 'link', text: 'Permissions', href: '#/paaages' },
+     // { type: 'link', text: 'Users', href: '#/users' },
     ],
   },
-  {
+  /*{
     type: 'section',
     text: 'Compliance',
     items: [
@@ -32,7 +32,7 @@ const navItems: SideNavigationProps.Item[] = [
     items: [
       { type: 'link', text: 'LDAP Sync', href: '#/database' },
     ],
-  },
+  },*/
 ];
 
 export default function App() {
