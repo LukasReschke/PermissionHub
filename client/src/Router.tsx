@@ -38,7 +38,6 @@ const navItems: SideNavigationProps.Item[] = [
 
 export const router = createBrowserRouter([
     {
-        
         path: '/',
         element: <MainLayout />,
         children: [
