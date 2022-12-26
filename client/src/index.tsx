@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
-import { BrowserRouter } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { Provider, createClient, dedupExchange, fetchExchange } from 'urql';
 import { cacheExchange } from '@urql/exchange-graphcache';
 import { GraphCacheConfig } from './gql/graphql';
 import { PermissionDomainsQuery } from './pages/Manage/PermissionDomains/PermissionDomainsPage';
 import schema from './generated-introspection'
+import { router } from './Router';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -52,10 +52,8 @@ const client = createClient({
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Provider value={client}>
-        <App />
-      </Provider>
-    </BrowserRouter>
+    <Provider value={client}>
+      <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>
 );
