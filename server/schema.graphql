@@ -9,12 +9,12 @@ type Query implements Node {
   """
   The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
   """
-  id: ID!
+  nodeId: ID!
 
   """Fetches an object given its globally unique `ID`."""
   node(
     """The globally unique `ID`."""
-    id: ID!
+    nodeId: ID!
   ): Node
 
   """Reads and enables pagination through a set of `Permission`."""
@@ -74,24 +74,25 @@ type Query implements Node {
     """
     condition: PermissionDomainCondition
   ): PermissionDomainsConnection
-  permission(rowId: Int!): Permission
-  permissionDomain(rowId: Int!): PermissionDomain
+  permission(id: Int!): Permission
+  permissionByName(name: String!): Permission
+  permissionDomain(id: Int!): PermissionDomain
   permissionDomainByName(name: String!): PermissionDomain
 
   """Reads a single `Permission` using its globally unique `ID`."""
-  permissionById(
+  permissionByNodeId(
     """
     The globally unique `ID` to be used in selecting a single `Permission`.
     """
-    id: ID!
+    nodeId: ID!
   ): Permission
 
   """Reads a single `PermissionDomain` using its globally unique `ID`."""
-  permissionDomainById(
+  permissionDomainByNodeId(
     """
     The globally unique `ID` to be used in selecting a single `PermissionDomain`.
     """
-    id: ID!
+    nodeId: ID!
   ): PermissionDomain
 }
 
@@ -100,7 +101,7 @@ interface Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  id: ID!
+  nodeId: ID!
 }
 
 """A connection to a list of `Permission` values."""
@@ -125,8 +126,8 @@ type Permission implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  id: ID!
-  rowId: Int!
+  nodeId: ID!
+  id: Int!
 
   """Unique name for a permission inside a permission domain"""
   name: String!
@@ -143,10 +144,10 @@ type PermissionDomain implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  id: ID!
+  nodeId: ID!
 
   """Unique ID of the permission domain"""
-  rowId: Int!
+  id: Int!
 
   """Unique name of the permission domain"""
   name: String!
@@ -202,8 +203,8 @@ A condition to be used against `Permission` object types. All fields are tested
 for equality and combined with a logical ‘and.’
 """
 input PermissionCondition {
-  """Checks for equality with the object’s `rowId` field."""
-  rowId: Int
+  """Checks for equality with the object’s `id` field."""
+  id: Int
 
   """Checks for equality with the object’s `name` field."""
   name: String
@@ -280,8 +281,8 @@ A condition to be used against `PermissionDomain` object types. All fields are
 tested for equality and combined with a logical ‘and.’
 """
 input PermissionDomainCondition {
-  """Checks for equality with the object’s `rowId` field."""
-  rowId: Int
+  """Checks for equality with the object’s `id` field."""
+  id: Int
 
   """Checks for equality with the object’s `name` field."""
   name: String
@@ -310,11 +311,11 @@ type Mutation {
   """
   Updates a single `Permission` using its globally unique id and a patch.
   """
-  updatePermissionById(
+  updatePermissionByNodeId(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdatePermissionByIdInput!
+    input: UpdatePermissionByNodeIdInput!
   ): UpdatePermissionPayload
 
   """Updates a single `Permission` using a unique key and a patch."""
@@ -325,12 +326,20 @@ type Mutation {
     input: UpdatePermissionInput!
   ): UpdatePermissionPayload
 
-  """Deletes a single `Permission` using its globally unique id."""
-  deletePermissionById(
+  """Updates a single `Permission` using a unique key and a patch."""
+  updatePermissionByName(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeletePermissionByIdInput!
+    input: UpdatePermissionByNameInput!
+  ): UpdatePermissionPayload
+
+  """Deletes a single `Permission` using its globally unique id."""
+  deletePermissionByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePermissionByNodeIdInput!
   ): DeletePermissionPayload
 
   """Deletes a single `Permission` using a unique key."""
@@ -341,12 +350,20 @@ type Mutation {
     input: DeletePermissionInput!
   ): DeletePermissionPayload
 
-  """Deletes a single `PermissionDomain` using its globally unique id."""
-  deletePermissionDomainById(
+  """Deletes a single `Permission` using a unique key."""
+  deletePermissionByName(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeletePermissionDomainByIdInput!
+    input: DeletePermissionByNameInput!
+  ): DeletePermissionPayload
+
+  """Deletes a single `PermissionDomain` using its globally unique id."""
+  deletePermissionDomainByNodeId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePermissionDomainByNodeIdInput!
   ): DeletePermissionDomainPayload
 
   """Deletes a single `PermissionDomain` using a unique key."""
@@ -408,7 +425,7 @@ input CreatePermissionInput {
 
 """An input for mutations affecting `Permission`"""
 input PermissionInput {
-  rowId: Int
+  id: Int
 
   """Unique name for a permission inside a permission domain"""
   name: String!
@@ -484,8 +501,8 @@ type UpdatePermissionPayload {
   ): PermissionsEdge
 }
 
-"""All input for the `updatePermissionById` mutation."""
-input UpdatePermissionByIdInput {
+"""All input for the `updatePermissionByNodeId` mutation."""
+input UpdatePermissionByNodeIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -495,7 +512,7 @@ input UpdatePermissionByIdInput {
   """
   The globally unique `ID` which will identify a single `Permission` to be updated.
   """
-  id: ID!
+  nodeId: ID!
 
   """
   An object where the defined keys will be set on the `Permission` being updated.
@@ -507,7 +524,7 @@ input UpdatePermissionByIdInput {
 Represents an update to a `Permission`. Fields that are set will be updated.
 """
 input PermissionPatch {
-  rowId: Int
+  id: Int
 
   """Unique name for a permission inside a permission domain"""
   name: String
@@ -526,7 +543,24 @@ input UpdatePermissionInput {
   An object where the defined keys will be set on the `Permission` being updated.
   """
   patch: PermissionPatch!
-  rowId: Int!
+  id: Int!
+}
+
+"""All input for the `updatePermissionByName` mutation."""
+input UpdatePermissionByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Permission` being updated.
+  """
+  patch: PermissionPatch!
+
+  """Unique name for a permission inside a permission domain"""
+  name: String!
 }
 
 """The output of our delete `Permission` mutation."""
@@ -539,7 +573,7 @@ type DeletePermissionPayload {
 
   """The `Permission` that was deleted by this mutation."""
   permission: Permission
-  deletedPermissionId: ID
+  deletedPermissionNodeId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -558,8 +592,8 @@ type DeletePermissionPayload {
   ): PermissionsEdge
 }
 
-"""All input for the `deletePermissionById` mutation."""
-input DeletePermissionByIdInput {
+"""All input for the `deletePermissionByNodeId` mutation."""
+input DeletePermissionByNodeIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -569,7 +603,7 @@ input DeletePermissionByIdInput {
   """
   The globally unique `ID` which will identify a single `Permission` to be deleted.
   """
-  id: ID!
+  nodeId: ID!
 }
 
 """All input for the `deletePermission` mutation."""
@@ -579,7 +613,19 @@ input DeletePermissionInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  rowId: Int!
+  id: Int!
+}
+
+"""All input for the `deletePermissionByName` mutation."""
+input DeletePermissionByNameInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """Unique name for a permission inside a permission domain"""
+  name: String!
 }
 
 """The output of our delete `PermissionDomain` mutation."""
@@ -592,7 +638,7 @@ type DeletePermissionDomainPayload {
 
   """The `PermissionDomain` that was deleted by this mutation."""
   permissionDomain: PermissionDomain
-  deletedPermissionDomainId: ID
+  deletedPermissionDomainNodeId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -606,8 +652,8 @@ type DeletePermissionDomainPayload {
   ): PermissionDomainsEdge
 }
 
-"""All input for the `deletePermissionDomainById` mutation."""
-input DeletePermissionDomainByIdInput {
+"""All input for the `deletePermissionDomainByNodeId` mutation."""
+input DeletePermissionDomainByNodeIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -617,7 +663,7 @@ input DeletePermissionDomainByIdInput {
   """
   The globally unique `ID` which will identify a single `PermissionDomain` to be deleted.
   """
-  id: ID!
+  nodeId: ID!
 }
 
 """All input for the `deletePermissionDomain` mutation."""
@@ -629,7 +675,7 @@ input DeletePermissionDomainInput {
   clientMutationId: String
 
   """Unique ID of the permission domain"""
-  rowId: Int!
+  id: Int!
 }
 
 """All input for the `deletePermissionDomainByName` mutation."""

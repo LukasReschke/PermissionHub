@@ -21,7 +21,6 @@ app.use(
       appendPlugins: [require("@graphile-contrib/pg-simplify-inflector")],
       exportGqlSchemaPath: "schema.graphql",
       graphiql: true,
-      classicIds: true,
       enhanceGraphiql: true,
       allowExplain(req) {
         return true;

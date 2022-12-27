@@ -6,6 +6,7 @@ import PermissionDomainsPage from './pages/Manage/PermissionDomains/PermissionDo
 import { SideNavigationProps } from "@cloudscape-design/components/side-navigation/interfaces";
 import CreatePermissionDomainPage from "./pages/Manage/PermissionDomains/CreatePermissionDomainPage";
 import PermissionsByDomainListPage from "./pages/Manage/PermissionDomains/Permissions/PermissionsByDomainListPage";
+import CreatePermissionPage from "./pages/Manage/PermissionDomains/Permissions/CreatePermissionPage";
 
 const navItems: SideNavigationProps.Item[] = [
     {
@@ -48,6 +49,10 @@ export const router = createBrowserRouter([
             {
                 path: '/manage/permissiondomains/:id',
                 element: <PermissionsByDomainListPage navItems={navItems} />,
+            },
+            {
+                path: '/manage/permissiondomains/:id/create',
+                element: <CreatePermissionPage navItems={navItems} />,
             },
             {
                 path: '/manage/permissiondomains/create',

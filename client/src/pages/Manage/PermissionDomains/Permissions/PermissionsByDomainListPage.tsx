@@ -8,21 +8,19 @@ import BreadcrumbGroup from "../../../../components/BreadcrumbGroup";
 import Link from "../../../../components/Link";
 import SideNavigation from "../../../../components/SideNavigation";
 import { graphql } from "../../../../gql";
-import { FetchPermissionDomainInfosByIdQuery, PermissionDomain, PermissionDomainsConnection } from "../../../../gql/graphql";
+import { FetchPermissionDomainInfosQuery, PermissionDomain, PermissionDomainsConnection } from "../../../../gql/graphql";
 
 type Props = {
     navItems: SideNavigationProps.Item[],
 }
 
-const PermissionDomainQuery = graphql(`query FetchPermissionDomainInfosById($id: ID!) {
-    node(id: $id) {
-      ... on PermissionDomain {
-        name
-        permissions {
-          nodes {
-            id
-            name
-          }
+const PermissionDomainQuery = graphql(`query FetchPermissionDomainInfos($id: Int!) {
+    permissionDomain(id: $id) {
+      name
+      permissions {
+        nodes {
+          id
+          name
         }
       }
     }
@@ -32,7 +30,7 @@ const PermissionDomainQuery = graphql(`query FetchPermissionDomainInfosById($id:
 export default function PermissionsByDomainListPage({ navItems }: Props) {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [permissionDomainId, setPermissionDomainId] = useState<string | undefined>(id);
+    const [permissionDomainId, setPermissionDomainId] = useState<number | undefined>(Number(id));
 
     const [result, reexecuteQuery] = useQuery({
         query: PermissionDomainQuery,
@@ -42,7 +40,7 @@ export default function PermissionsByDomainListPage({ navItems }: Props) {
         pause: permissionDomainId === undefined,
     });
 
-    const [permissionDomain, setPermissionDomain] = useState<FetchPermissionDomainInfosByIdQuery>();
+    const [permissionDomain, setPermissionDomain] = useState<FetchPermissionDomainInfosQuery>();
     useEffect(() => {
         setPermissionDomain(result.data);
     }, [result]);
@@ -63,10 +61,10 @@ export default function PermissionsByDomainListPage({ navItems }: Props) {
         },
     ];
 
-    if (permissionDomain !== undefined && permissionDomain.node && "name" in permissionDomain.node) {
+    if (permissionDomain !== undefined && permissionDomain.permissionDomain) {
         breadcrumbs.push(
             {
-                text: permissionDomain.node.name,
+                text: permissionDomain.permissionDomain.name,
                 href: '.',
             }
         );
@@ -95,12 +93,10 @@ export default function PermissionsByDomainListPage({ navItems }: Props) {
                             </SpaceBetween>
                         }
                     >
-                        {(permissionDomain !== undefined && permissionDomain.node && "name" in permissionDomain.node) &&
-                            <>{permissionDomain.node.name}</>
-                        }
+                        {permissionDomain?.permissionDomain?.name}
                     </Header>
                 }
-                items={permissionDomain?.node && "permissions" in permissionDomain.node ? permissionDomain?.node.permissions.nodes : []}
+                items={permissionDomain?.permissionDomain!.permissions.nodes ?? []}
             />
         }
     />;

@@ -37,8 +37,8 @@ query FetchAllPermissionDomains {
 `);
 
 const DeletePermissionDomainMutation = graphql(`
-mutation DeletePermissionDomainByIdMutation($id: ID!) {
-    deletePermissionDomainById(input: {id: $id}) {
+mutation DeletePermissionDomainMutation($id: Int!) {
+    deletePermissionDomain(input: {id: $id}) {
       permissionDomain {
         __typename
         id
@@ -195,7 +195,7 @@ const Content = () => {
     };
     const navigateToSelectedPermissionDomain = () => {
         if (selectedItems.length === 1) {
-            navigate(`./${encodeURI(selectedItems[0].id)}`);
+            navigate(`./${selectedItems[0].id}`);
         }
     };
 

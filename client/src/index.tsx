@@ -32,9 +32,9 @@ const client = createClient({
                 return data;
               });
             },
-            deletePermissionDomainById(_result, args, cache, _info) {
-              const id = _result.deletePermissionDomainById?.permissionDomain?.id;
-              const typeName = _result.deletePermissionDomainById?.permissionDomain?.__typename;
+            deletePermissionDomain(_result, args, cache, _info) {
+              const id = _result.deletePermissionDomain?.permissionDomain?.id;
+              const typeName = _result.deletePermissionDomain?.permissionDomain?.__typename;
 
               if (id !== undefined && typeName !== undefined) {
                 cache.invalidate({
