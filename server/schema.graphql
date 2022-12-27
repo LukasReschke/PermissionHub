@@ -9,12 +9,12 @@ type Query implements Node {
   """
   The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
   """
-  nodeId: ID!
+  id: ID!
 
   """Fetches an object given its globally unique `ID`."""
   node(
     """The globally unique `ID`."""
-    nodeId: ID!
+    id: ID!
   ): Node
 
   """Reads and enables pagination through a set of `Permission`."""
@@ -38,7 +38,7 @@ type Query implements Node {
     after: Cursor
 
     """The method to use when ordering `Permission`."""
-    orderBy: [PermissionsOrderBy!] = [NATURAL]
+    orderBy: [PermissionsOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -74,16 +74,24 @@ type Query implements Node {
     """
     condition: PermissionDomainCondition
   ): PermissionDomainsConnection
-  permissionById(id: Int!): Permission
-  permissionDomain(id: Int!): PermissionDomain
+  permission(rowId: Int!): Permission
+  permissionDomain(rowId: Int!): PermissionDomain
   permissionDomainByName(name: String!): PermissionDomain
 
+  """Reads a single `Permission` using its globally unique `ID`."""
+  permissionById(
+    """
+    The globally unique `ID` to be used in selecting a single `Permission`.
+    """
+    id: ID!
+  ): Permission
+
   """Reads a single `PermissionDomain` using its globally unique `ID`."""
-  permissionDomainByNodeId(
+  permissionDomainById(
     """
     The globally unique `ID` to be used in selecting a single `PermissionDomain`.
     """
-    nodeId: ID!
+    id: ID!
   ): PermissionDomain
 }
 
@@ -92,7 +100,7 @@ interface Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
+  id: ID!
 }
 
 """A connection to a list of `Permission` values."""
@@ -112,8 +120,15 @@ type PermissionsConnection {
   totalCount: Int!
 }
 
-type Permission {
-  id: Int!
+"""A permission defines an ACL'd action on a given permission domain."""
+type Permission implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+  rowId: Int!
+
+  """Unique name for a permission inside a permission domain"""
   name: String!
   permissionDomainId: Int!
 
@@ -128,10 +143,10 @@ type PermissionDomain implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
-  nodeId: ID!
+  id: ID!
 
   """Unique ID of the permission domain"""
-  id: Int!
+  rowId: Int!
 
   """Unique name of the permission domain"""
   name: String!
@@ -157,7 +172,7 @@ type PermissionDomain implements Node {
     after: Cursor
 
     """The method to use when ordering `Permission`."""
-    orderBy: [PermissionsOrderBy!] = [NATURAL]
+    orderBy: [PermissionsOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A condition to be used in determining which values should be returned by the collection.
@@ -178,6 +193,8 @@ enum PermissionsOrderBy {
   NAME_DESC
   PERMISSION_DOMAIN_ID_ASC
   PERMISSION_DOMAIN_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
 """
@@ -185,8 +202,8 @@ A condition to be used against `Permission` object types. All fields are tested
 for equality and combined with a logical ‘and.’
 """
 input PermissionCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
+  """Checks for equality with the object’s `rowId` field."""
+  rowId: Int
 
   """Checks for equality with the object’s `name` field."""
   name: String
@@ -263,8 +280,8 @@ A condition to be used against `PermissionDomain` object types. All fields are
 tested for equality and combined with a logical ‘and.’
 """
 input PermissionDomainCondition {
-  """Checks for equality with the object’s `id` field."""
-  id: Int
+  """Checks for equality with the object’s `rowId` field."""
+  rowId: Int
 
   """Checks for equality with the object’s `name` field."""
   name: String
@@ -290,7 +307,9 @@ type Mutation {
     input: CreatePermissionDomainInput!
   ): CreatePermissionDomainPayload
 
-  """Updates a single `Permission` using a unique key and a patch."""
+  """
+  Updates a single `Permission` using its globally unique id and a patch.
+  """
   updatePermissionById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -298,7 +317,15 @@ type Mutation {
     input: UpdatePermissionByIdInput!
   ): UpdatePermissionPayload
 
-  """Deletes a single `Permission` using a unique key."""
+  """Updates a single `Permission` using a unique key and a patch."""
+  updatePermission(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePermissionInput!
+  ): UpdatePermissionPayload
+
+  """Deletes a single `Permission` using its globally unique id."""
   deletePermissionById(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -306,12 +333,20 @@ type Mutation {
     input: DeletePermissionByIdInput!
   ): DeletePermissionPayload
 
-  """Deletes a single `PermissionDomain` using its globally unique id."""
-  deletePermissionDomainByNodeId(
+  """Deletes a single `Permission` using a unique key."""
+  deletePermission(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeletePermissionDomainByNodeIdInput!
+    input: DeletePermissionInput!
+  ): DeletePermissionPayload
+
+  """Deletes a single `PermissionDomain` using its globally unique id."""
+  deletePermissionDomainById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePermissionDomainByIdInput!
   ): DeletePermissionDomainPayload
 
   """Deletes a single `PermissionDomain` using a unique key."""
@@ -355,7 +390,7 @@ type CreatePermissionPayload {
   """An edge for our `Permission`. May be used by Relay 1."""
   permissionEdge(
     """The method to use when ordering `Permission`."""
-    orderBy: [PermissionsOrderBy!] = [NATURAL]
+    orderBy: [PermissionsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PermissionsEdge
 }
 
@@ -373,6 +408,9 @@ input CreatePermissionInput {
 
 """An input for mutations affecting `Permission`"""
 input PermissionInput {
+  rowId: Int
+
+  """Unique name for a permission inside a permission domain"""
   name: String!
   permissionDomainId: Int!
 }
@@ -442,7 +480,7 @@ type UpdatePermissionPayload {
   """An edge for our `Permission`. May be used by Relay 1."""
   permissionEdge(
     """The method to use when ordering `Permission`."""
-    orderBy: [PermissionsOrderBy!] = [NATURAL]
+    orderBy: [PermissionsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PermissionsEdge
 }
 
@@ -455,19 +493,40 @@ input UpdatePermissionByIdInput {
   clientMutationId: String
 
   """
+  The globally unique `ID` which will identify a single `Permission` to be updated.
+  """
+  id: ID!
+
+  """
   An object where the defined keys will be set on the `Permission` being updated.
   """
   patch: PermissionPatch!
-  id: Int!
 }
 
 """
 Represents an update to a `Permission`. Fields that are set will be updated.
 """
 input PermissionPatch {
-  id: Int
+  rowId: Int
+
+  """Unique name for a permission inside a permission domain"""
   name: String
   permissionDomainId: Int
+}
+
+"""All input for the `updatePermission` mutation."""
+input UpdatePermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Permission` being updated.
+  """
+  patch: PermissionPatch!
+  rowId: Int!
 }
 
 """The output of our delete `Permission` mutation."""
@@ -480,7 +539,7 @@ type DeletePermissionPayload {
 
   """The `Permission` that was deleted by this mutation."""
   permission: Permission
-  deletedPermissionNodeId: ID
+  deletedPermissionId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -495,7 +554,7 @@ type DeletePermissionPayload {
   """An edge for our `Permission`. May be used by Relay 1."""
   permissionEdge(
     """The method to use when ordering `Permission`."""
-    orderBy: [PermissionsOrderBy!] = [NATURAL]
+    orderBy: [PermissionsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PermissionsEdge
 }
 
@@ -506,7 +565,21 @@ input DeletePermissionByIdInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int!
+
+  """
+  The globally unique `ID` which will identify a single `Permission` to be deleted.
+  """
+  id: ID!
+}
+
+"""All input for the `deletePermission` mutation."""
+input DeletePermissionInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
 }
 
 """The output of our delete `PermissionDomain` mutation."""
@@ -519,7 +592,7 @@ type DeletePermissionDomainPayload {
 
   """The `PermissionDomain` that was deleted by this mutation."""
   permissionDomain: PermissionDomain
-  deletedPermissionDomainNodeId: ID
+  deletedPermissionDomainId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -533,8 +606,8 @@ type DeletePermissionDomainPayload {
   ): PermissionDomainsEdge
 }
 
-"""All input for the `deletePermissionDomainByNodeId` mutation."""
-input DeletePermissionDomainByNodeIdInput {
+"""All input for the `deletePermissionDomainById` mutation."""
+input DeletePermissionDomainByIdInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -544,7 +617,7 @@ input DeletePermissionDomainByNodeIdInput {
   """
   The globally unique `ID` which will identify a single `PermissionDomain` to be deleted.
   """
-  nodeId: ID!
+  id: ID!
 }
 
 """All input for the `deletePermissionDomain` mutation."""
@@ -556,7 +629,7 @@ input DeletePermissionDomainInput {
   clientMutationId: String
 
   """Unique ID of the permission domain"""
-  id: Int!
+  rowId: Int!
 }
 
 """All input for the `deletePermissionDomainByName` mutation."""
