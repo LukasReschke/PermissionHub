@@ -1,8 +1,8 @@
-import { Table, TableProps } from "@cloudscape-design/components";
+import { Button, Header, SpaceBetween, Table, TableProps } from "@cloudscape-design/components";
 import AppLayout from "@cloudscape-design/components/app-layout";
 import { SideNavigationProps } from "@cloudscape-design/components/side-navigation";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "urql";
 import BreadcrumbGroup from "../../../../components/BreadcrumbGroup";
 import SideNavigation from "../../../../components/SideNavigation";
@@ -29,6 +29,7 @@ const PermissionDomainQuery = graphql(`query FetchPermissionDomainInfosById($id:
 
 export default function PermissionsByDomainListPage({ navItems }: Props) {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [permissionDomainId, setPermissionDomainId] = useState<string | undefined>(id);
 
     const [result, reexecuteQuery] = useQuery({
@@ -82,9 +83,21 @@ export default function PermissionsByDomainListPage({ navItems }: Props) {
                     {
                         header: "Name",
                         cell: e => e.name,
-                        sortingField: "name",
                     },
                 ]}
+                header={
+                    <Header
+                        actions={
+                            <SpaceBetween size="xs" direction="horizontal">
+                                <Button onClick={e => { e.preventDefault(); navigate("./create"); }} variant="primary">Create permission</Button>
+                            </SpaceBetween>
+                        }
+                    >
+                        {(permissionDomain !== undefined && permissionDomain.node && "name" in permissionDomain.node) &&
+                            <>{permissionDomain.node.name}</>
+                        }
+                    </Header>
+                }
                 items={permissionDomain?.node && "permissions" in permissionDomain.node ? permissionDomain?.node.permissions.nodes : []}
             />
         }
