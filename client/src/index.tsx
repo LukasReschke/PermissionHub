@@ -8,6 +8,7 @@ import { GraphCacheConfig } from './gql/graphql';
 import { PermissionDomainsQuery } from './pages/Manage/PermissionDomains/PermissionDomainsPage';
 import schema from './generated-introspection'
 import { router } from './Router';
+import { PermissionDomainQuery } from './pages/Manage/PermissionDomains/Permissions/PermissionsByDomainListPage';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -28,6 +29,15 @@ const client = createClient({
                 const newPermissionDomain = _result.createPermissionDomain?.permissionDomain;
                 if (newPermissionDomain !== null && newPermissionDomain !== undefined) {
                   data?.permissionDomains?.nodes.push(newPermissionDomain);
+                }
+                return data;
+              });
+            },
+            createPermission(_result, args, cache, _info) {
+              cache.updateQuery({ query: PermissionDomainQuery, variables: { id: args.input.permission.permissionDomainId } }, data => {
+                const newPermission = _result.createPermission?.permission;
+                if (newPermission !== null && newPermission !== undefined) {
+                  data?.permissionDomain?.permissions?.nodes.push(newPermission);
                 }
                 return data;
               });

@@ -14,7 +14,7 @@ type Props = {
     navItems: SideNavigationProps.Item[],
 }
 
-const PermissionDomainQuery = graphql(`query FetchPermissionDomainInfos($id: Int!) {
+export const PermissionDomainQuery = graphql(`query FetchPermissionDomainInfos($id: Int!) {
     permissionDomain(id: $id) {
       name
       permissions {

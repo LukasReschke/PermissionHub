@@ -10,7 +10,7 @@ import Link from "@cloudscape-design/components/link";
 import { SideNavigationProps } from "@cloudscape-design/components/side-navigation";
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMutation } from "urql";
 import BreadcrumbGroup from "../../../../components/BreadcrumbGroup";
 import SideNavigation from "../../../../components/SideNavigation";
@@ -30,7 +30,12 @@ const breadcrumbs = [
         href: '/manage/permissiondomains',
     },
     {
-        text: 'Create permission domain',
+        // fixme: populate with permission domain name
+        text: 'todo',
+        href: './../',
+    },
+    {
+        text: 'Create permission',
         href: '/manage/permissiondomains/create',
     },
 ];
@@ -50,6 +55,7 @@ const createPermissionMutation = graphql(`mutation createPermissionMutation($dat
 
 export default function CreatePermissionPage({ navItems }: Props) {
     let navigate = useNavigate();
+    const { id } = useParams();
     const [writeInAction, setWriteInAction] = useState(false);
     const [createPermissionResult, createPermission] = useMutation(createPermissionMutation);
 
@@ -59,12 +65,12 @@ export default function CreatePermissionPage({ navItems }: Props) {
         if (permissionDomainName.length === 0) {
             setErrorMessage("Permission Domain Name is required.");
         } else {
-            createPermission({ data: { permission: { name: permissionDomainName, permissionDomainId: 5 } } }).then((result) => {
+            createPermission({ data: { permission: { name: permissionDomainName, permissionDomainId: Number(id) as number } } }).then((result) => {
                 if (result.error) {
                     setErrorMessage("Something went wrong.");
                 } else {
                     setErrorMessage("");
-                    navigate("/manage/permissiondomains");
+                    navigate("./../");
                 }
                 setWriteInAction(false);
             });
@@ -102,7 +108,7 @@ export default function CreatePermissionPage({ navItems }: Props) {
                         errorIconAriaLabel="Error"
                     >
                         <Container
-                            header={<Header variant="h2">Permission domain settings</Header>}
+                            header={<Header variant="h2">Permission domain</Header>}
                         >
                             <SpaceBetween size="l">
                                 <FormField
