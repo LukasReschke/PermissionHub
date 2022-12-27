@@ -20,7 +20,7 @@ type PermissionDomainsQueryResponse = NonNullable<FetchAllPermissionDomainsQuery
 const columnDefinitions: TableProps.ColumnDefinition<PermissionDomainsQueryResponse[0]>[] = [
     {
         header: "Name",
-        cell: e => e.name,
+        cell: e => <Link href={`./${e.id}`}>{e.name}</Link>,
         sortingField: "name",
     },
 ];
