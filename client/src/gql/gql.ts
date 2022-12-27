@@ -16,6 +16,7 @@ const documents = {
     "mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {\n    createPermissionDomain(input:$data) {\n      permissionDomain {\n        id\n        name\n      }\n    }\n}": types.AddNewPermissionDomainDocument,
     "\nquery FetchAllPermissionDomains {\n    permissionDomains {\n      nodes {\n        id\n        name\n      }\n    }\n  }\n": types.FetchAllPermissionDomainsDocument,
     "\nmutation DeletePermissionDomainMutation($id: Int!) {\n    deletePermissionDomain(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n": types.DeletePermissionDomainMutationDocument,
+    "query fetchNameOfPermissionDomain($id: Int!) {\n    permissionDomain(id: $id) {\n      name\n    }\n  }": types.FetchNameOfPermissionDomainDocument,
     "mutation createPermissionMutation($data: CreatePermissionInput!) {\n    createPermission(input: $data) {\n      permission {\n        id\n        name\n      }\n    }\n  }": types.CreatePermissionMutationDocument,
     "query FetchPermissionDomainInfos($id: Int!) {\n    permissionDomain(id: $id) {\n      name\n      permissions {\n        nodes {\n          id\n          name\n        }\n      }\n    }\n  }\n": types.FetchPermissionDomainInfosDocument,
 };
@@ -32,6 +33,10 @@ export function graphql(source: "\nquery FetchAllPermissionDomains {\n    permis
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\nmutation DeletePermissionDomainMutation($id: Int!) {\n    deletePermissionDomain(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n"): (typeof documents)["\nmutation DeletePermissionDomainMutation($id: Int!) {\n    deletePermissionDomain(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "query fetchNameOfPermissionDomain($id: Int!) {\n    permissionDomain(id: $id) {\n      name\n    }\n  }"): (typeof documents)["query fetchNameOfPermissionDomain($id: Int!) {\n    permissionDomain(id: $id) {\n      name\n    }\n  }"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

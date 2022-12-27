@@ -11,38 +11,20 @@ import { SideNavigationProps } from "@cloudscape-design/components/side-navigati
 import SpaceBetween from "@cloudscape-design/components/space-between";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useMutation } from "urql";
+import { useMutation, useQuery } from "urql";
 import BreadcrumbGroup from "../../../../components/BreadcrumbGroup";
 import SideNavigation from "../../../../components/SideNavigation";
 import { graphql } from "../../../../gql";
 
-const breadcrumbs = [
-    {
-        text: 'PermissionHub',
-        href: '/',
-    },
-    {
-        text: 'Manage',
-        href: '/manage/',
-    },
-    {
-        text: 'Permission domains',
-        href: '/manage/permissiondomains',
-    },
-    {
-        // fixme: populate with permission domain name
-        text: 'todo',
-        href: './../',
-    },
-    {
-        text: 'Create permission',
-        href: '/manage/permissiondomains/create',
-    },
-];
-
 type Props = {
     navItems: SideNavigationProps.Item[],
 }
+
+const FetchNameOfPermissionDomainQuery = graphql(`query fetchNameOfPermissionDomain($id: Int!) {
+    permissionDomain(id: $id) {
+      name
+    }
+  }`);
 
 const createPermissionMutation = graphql(`mutation createPermissionMutation($data: CreatePermissionInput!) {
     createPermission(input: $data) {
@@ -58,6 +40,13 @@ export default function CreatePermissionPage({ navItems }: Props) {
     const { id } = useParams();
     const [writeInAction, setWriteInAction] = useState(false);
     const [createPermissionResult, createPermission] = useMutation(createPermissionMutation);
+    const [nameOfPermissionDomain, reexecuteNameOfPermissionDomainQuery] = useQuery({
+        query: FetchNameOfPermissionDomainQuery,
+        variables: {
+            id: Number(id) as number,
+        },
+        pause: id === undefined,
+    });
 
     let handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         setWriteInAction(true);
@@ -79,6 +68,28 @@ export default function CreatePermissionPage({ navItems }: Props) {
     const [errorMessage, setErrorMessage] = useState("");
     const [permissionDomainName, setPermissionDomainName] = useState("");
 
+    const breadcrumbs = [
+        {
+            text: 'PermissionHub',
+            href: '/',
+        },
+        {
+            text: 'Manage',
+            href: '/manage/',
+        },
+        {
+            text: 'Permission domains',
+            href: '/manage/permissiondomains',
+        },
+        {
+            text: nameOfPermissionDomain.data?.permissionDomain?.name ?? '',
+            href: './../',
+        },
+        {
+            text: 'Create permission',
+            href: '/manage/permissiondomains/create',
+        },
+    ];
     return <AppLayout
         toolsHide
         navigation={<SideNavigation activeHref="/manage/permissiondomains" items={navItems} />}
