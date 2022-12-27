@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "urql";
 import BreadcrumbGroup from "../../../../components/BreadcrumbGroup";
+import Link from "../../../../components/Link";
 import SideNavigation from "../../../../components/SideNavigation";
 import { graphql } from "../../../../gql";
 import { FetchPermissionDomainInfosByIdQuery, PermissionDomain, PermissionDomainsConnection } from "../../../../gql/graphql";
@@ -19,6 +20,7 @@ const PermissionDomainQuery = graphql(`query FetchPermissionDomainInfosById($id:
         name
         permissions {
           nodes {
+            id
             name
           }
         }
@@ -82,7 +84,7 @@ export default function PermissionsByDomainListPage({ navItems }: Props) {
                 columnDefinitions={[
                     {
                         header: "Name",
-                        cell: e => e.name,
+                        cell: e => <Link href={'./' + e.id}>{e.name}</Link>,
                     },
                 ]}
                 header={
