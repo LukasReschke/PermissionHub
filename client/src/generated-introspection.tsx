@@ -312,7 +312,27 @@ export default {
             ]
           },
           {
-            "name": "deletePermissionByRowId",
+            "name": "deletePermission",
+            "type": {
+              "kind": "OBJECT",
+              "name": "DeletePermissionPayload",
+              "ofType": null
+            },
+            "args": [
+              {
+                "name": "input",
+                "type": {
+                  "kind": "NON_NULL",
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Any"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "deletePermissionById",
             "type": {
               "kind": "OBJECT",
               "name": "DeletePermissionPayload",
@@ -392,7 +412,27 @@ export default {
             ]
           },
           {
-            "name": "updatePermissionByRowId",
+            "name": "updatePermission",
+            "type": {
+              "kind": "OBJECT",
+              "name": "UpdatePermissionPayload",
+              "ofType": null
+            },
+            "args": [
+              {
+                "name": "input",
+                "type": {
+                  "kind": "NON_NULL",
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Any"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "updatePermissionById",
             "type": {
               "kind": "OBJECT",
               "name": "UpdatePermissionPayload",
@@ -432,6 +472,10 @@ export default {
         ],
         "interfaces": [],
         "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "Permission"
+          },
           {
             "kind": "OBJECT",
             "name": "PermissionDomain"
@@ -492,6 +536,17 @@ export default {
         "name": "Permission",
         "fields": [
           {
+            "name": "id",
+            "type": {
+              "kind": "NON_NULL",
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Any"
+              }
+            },
+            "args": []
+          },
+          {
             "name": "name",
             "type": {
               "kind": "NON_NULL",
@@ -534,7 +589,12 @@ export default {
             "args": []
           }
         ],
-        "interfaces": []
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Node"
+          }
+        ]
       },
       {
         "kind": "OBJECT",
@@ -871,7 +931,7 @@ export default {
             ]
           },
           {
-            "name": "permissionByRowId",
+            "name": "permission",
             "type": {
               "kind": "OBJECT",
               "name": "Permission",
@@ -880,6 +940,26 @@ export default {
             "args": [
               {
                 "name": "rowId",
+                "type": {
+                  "kind": "NON_NULL",
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Any"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "name": "permissionById",
+            "type": {
+              "kind": "OBJECT",
+              "name": "Permission",
+              "ofType": null
+            },
+            "args": [
+              {
+                "name": "id",
                 "type": {
                   "kind": "NON_NULL",
                   "ofType": {

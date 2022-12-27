@@ -86,14 +86,15 @@ export type CreatePermissionPayloadPermissionEdgeArgs = {
   orderBy?: InputMaybe<Array<PermissionsOrderBy>>;
 };
 
-/** All input for the `deletePermissionByRowId` mutation. */
-export type DeletePermissionByRowIdInput = {
+/** All input for the `deletePermissionById` mutation. */
+export type DeletePermissionByIdInput = {
   /**
    * An arbitrary string value with no semantic meaning. Will be included in the
    * payload verbatim. May be used to track mutations by the client.
    */
   clientMutationId?: InputMaybe<Scalars['String']>;
-  rowId: Scalars['Int'];
+  /** The globally unique `ID` which will identify a single `Permission` to be deleted. */
+  id: Scalars['ID'];
 };
 
 /** All input for the `deletePermissionDomainById` mutation. */
@@ -152,6 +153,16 @@ export type DeletePermissionDomainPayloadPermissionDomainEdgeArgs = {
   orderBy?: InputMaybe<Array<PermissionDomainsOrderBy>>;
 };
 
+/** All input for the `deletePermission` mutation. */
+export type DeletePermissionInput = {
+  /**
+   * An arbitrary string value with no semantic meaning. Will be included in the
+   * payload verbatim. May be used to track mutations by the client.
+   */
+  clientMutationId?: InputMaybe<Scalars['String']>;
+  rowId: Scalars['Int'];
+};
+
 /** The output of our delete `Permission` mutation. */
 export type DeletePermissionPayload = {
   __typename?: 'DeletePermissionPayload';
@@ -185,7 +196,9 @@ export type Mutation = {
   /** Creates a single `PermissionDomain`. */
   createPermissionDomain?: Maybe<CreatePermissionDomainPayload>;
   /** Deletes a single `Permission` using a unique key. */
-  deletePermissionByRowId?: Maybe<DeletePermissionPayload>;
+  deletePermission?: Maybe<DeletePermissionPayload>;
+  /** Deletes a single `Permission` using its globally unique id. */
+  deletePermissionById?: Maybe<DeletePermissionPayload>;
   /** Deletes a single `PermissionDomain` using a unique key. */
   deletePermissionDomain?: Maybe<DeletePermissionDomainPayload>;
   /** Deletes a single `PermissionDomain` using its globally unique id. */
@@ -193,7 +206,9 @@ export type Mutation = {
   /** Deletes a single `PermissionDomain` using a unique key. */
   deletePermissionDomainByName?: Maybe<DeletePermissionDomainPayload>;
   /** Updates a single `Permission` using a unique key and a patch. */
-  updatePermissionByRowId?: Maybe<UpdatePermissionPayload>;
+  updatePermission?: Maybe<UpdatePermissionPayload>;
+  /** Updates a single `Permission` using its globally unique id and a patch. */
+  updatePermissionById?: Maybe<UpdatePermissionPayload>;
 };
 
 
@@ -210,8 +225,14 @@ export type MutationCreatePermissionDomainArgs = {
 
 
 /** The root mutation type which contains root level fields which mutate data. */
-export type MutationDeletePermissionByRowIdArgs = {
-  input: DeletePermissionByRowIdInput;
+export type MutationDeletePermissionArgs = {
+  input: DeletePermissionInput;
+};
+
+
+/** The root mutation type which contains root level fields which mutate data. */
+export type MutationDeletePermissionByIdArgs = {
+  input: DeletePermissionByIdInput;
 };
 
 
@@ -234,8 +255,14 @@ export type MutationDeletePermissionDomainByNameArgs = {
 
 
 /** The root mutation type which contains root level fields which mutate data. */
-export type MutationUpdatePermissionByRowIdArgs = {
-  input: UpdatePermissionByRowIdInput;
+export type MutationUpdatePermissionArgs = {
+  input: UpdatePermissionInput;
+};
+
+
+/** The root mutation type which contains root level fields which mutate data. */
+export type MutationUpdatePermissionByIdArgs = {
+  input: UpdatePermissionByIdInput;
 };
 
 /** An object with a globally unique `ID`. */
@@ -257,8 +284,12 @@ export type PageInfo = {
   startCursor?: Maybe<Scalars['Cursor']>;
 };
 
-export type Permission = {
+/** A permission defines an ACL'd action on a given permission domain. */
+export type Permission = Node & {
   __typename?: 'Permission';
+  /** A globally unique identifier. Can be used in various places throughout the system to identify this single value. */
+  id: Scalars['ID'];
+  /** Unique name for a permission inside a permission domain */
   name: Scalars['String'];
   /** Reads a single `PermissionDomain` that is related to this `Permission`. */
   permissionDomain?: Maybe<PermissionDomain>;
@@ -356,12 +387,15 @@ export enum PermissionDomainsOrderBy {
 
 /** An input for mutations affecting `Permission` */
 export type PermissionInput = {
+  /** Unique name for a permission inside a permission domain */
   name: Scalars['String'];
   permissionDomainId: Scalars['Int'];
+  rowId?: InputMaybe<Scalars['Int']>;
 };
 
 /** Represents an update to a `Permission`. Fields that are set will be updated. */
 export type PermissionPatch = {
+  /** Unique name for a permission inside a permission domain */
   name?: InputMaybe<Scalars['String']>;
   permissionDomainId?: InputMaybe<Scalars['Int']>;
   rowId?: InputMaybe<Scalars['Int']>;
@@ -397,7 +431,9 @@ export enum PermissionsOrderBy {
   NameDesc = 'NAME_DESC',
   Natural = 'NATURAL',
   PermissionDomainIdAsc = 'PERMISSION_DOMAIN_ID_ASC',
-  PermissionDomainIdDesc = 'PERMISSION_DOMAIN_ID_DESC'
+  PermissionDomainIdDesc = 'PERMISSION_DOMAIN_ID_DESC',
+  PrimaryKeyAsc = 'PRIMARY_KEY_ASC',
+  PrimaryKeyDesc = 'PRIMARY_KEY_DESC'
 }
 
 /** The root query type which gives access points into the data universe. */
@@ -407,7 +443,9 @@ export type Query = Node & {
   id: Scalars['ID'];
   /** Fetches an object given its globally unique `ID`. */
   node?: Maybe<Node>;
-  permissionByRowId?: Maybe<Permission>;
+  permission?: Maybe<Permission>;
+  /** Reads a single `Permission` using its globally unique `ID`. */
+  permissionById?: Maybe<Permission>;
   permissionDomain?: Maybe<PermissionDomain>;
   /** Reads a single `PermissionDomain` using its globally unique `ID`. */
   permissionDomainById?: Maybe<PermissionDomain>;
@@ -431,8 +469,14 @@ export type QueryNodeArgs = {
 
 
 /** The root query type which gives access points into the data universe. */
-export type QueryPermissionByRowIdArgs = {
+export type QueryPermissionArgs = {
   rowId: Scalars['Int'];
+};
+
+
+/** The root query type which gives access points into the data universe. */
+export type QueryPermissionByIdArgs = {
+  id: Scalars['ID'];
 };
 
 
@@ -477,8 +521,21 @@ export type QueryPermissionsArgs = {
   orderBy?: InputMaybe<Array<PermissionsOrderBy>>;
 };
 
-/** All input for the `updatePermissionByRowId` mutation. */
-export type UpdatePermissionByRowIdInput = {
+/** All input for the `updatePermissionById` mutation. */
+export type UpdatePermissionByIdInput = {
+  /**
+   * An arbitrary string value with no semantic meaning. Will be included in the
+   * payload verbatim. May be used to track mutations by the client.
+   */
+  clientMutationId?: InputMaybe<Scalars['String']>;
+  /** The globally unique `ID` which will identify a single `Permission` to be updated. */
+  id: Scalars['ID'];
+  /** An object where the defined keys will be set on the `Permission` being updated. */
+  patch: PermissionPatch;
+};
+
+/** All input for the `updatePermission` mutation. */
+export type UpdatePermissionInput = {
   /**
    * An arbitrary string value with no semantic meaning. Will be included in the
    * payload verbatim. May be used to track mutations by the client.
@@ -532,18 +589,26 @@ export type DeletePermissionDomainByIdMutationMutationVariables = Exact<{
 
 export type DeletePermissionDomainByIdMutationMutation = { __typename?: 'Mutation', deletePermissionDomainById?: { __typename?: 'DeletePermissionDomainPayload', permissionDomain?: { __typename: 'PermissionDomain', id: string } | null } | null };
 
+export type CreatePermissionMutationMutationVariables = Exact<{
+  data: CreatePermissionInput;
+}>;
+
+
+export type CreatePermissionMutationMutation = { __typename?: 'Mutation', createPermission?: { __typename?: 'CreatePermissionPayload', permission?: { __typename?: 'Permission', id: string, name: string } | null } | null };
+
 export type FetchPermissionDomainInfosByIdQueryVariables = Exact<{
   id: Scalars['ID'];
 }>;
 
 
-export type FetchPermissionDomainInfosByIdQuery = { __typename?: 'Query', node?: { __typename?: 'PermissionDomain', name: string, permissions: { __typename?: 'PermissionsConnection', nodes: Array<{ __typename?: 'Permission', name: string }> } } | { __typename?: 'Query' } | null };
+export type FetchPermissionDomainInfosByIdQuery = { __typename?: 'Query', node?: { __typename?: 'Permission' } | { __typename?: 'PermissionDomain', name: string, permissions: { __typename?: 'PermissionsConnection', nodes: Array<{ __typename?: 'Permission', id: string, name: string }> } } | { __typename?: 'Query' } | null };
 
 
 export const AddNewPermissionDomainDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddNewPermissionDomain"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreatePermissionDomainInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPermissionDomain"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permissionDomain"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<AddNewPermissionDomainMutation, AddNewPermissionDomainMutationVariables>;
 export const FetchAllPermissionDomainsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FetchAllPermissionDomains"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permissionDomains"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<FetchAllPermissionDomainsQuery, FetchAllPermissionDomainsQueryVariables>;
 export const DeletePermissionDomainByIdMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeletePermissionDomainByIdMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deletePermissionDomainById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permissionDomain"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<DeletePermissionDomainByIdMutationMutation, DeletePermissionDomainByIdMutationMutationVariables>;
-export const FetchPermissionDomainInfosByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FetchPermissionDomainInfosById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"PermissionDomain"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<FetchPermissionDomainInfosByIdQuery, FetchPermissionDomainInfosByIdQueryVariables>;
+export const CreatePermissionMutationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createPermissionMutation"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreatePermissionInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPermission"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permission"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<CreatePermissionMutationMutation, CreatePermissionMutationMutationVariables>;
+export const FetchPermissionDomainInfosByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FetchPermissionDomainInfosById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"PermissionDomain"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<FetchPermissionDomainInfosByIdQuery, FetchPermissionDomainInfosByIdQueryVariables>;
 export type WithTypename<T extends { __typename?: any }> = Partial<T> & { __typename: NonNullable<T['__typename']> };
 
 export type GraphCacheKeysConfig = {
@@ -564,8 +629,9 @@ export type GraphCacheKeysConfig = {
 export type GraphCacheResolvers = {
   Query?: {
     id?: GraphCacheResolver<WithTypename<Query>, Record<string, never>, Scalars['ID'] | string>,
-    node?: GraphCacheResolver<WithTypename<Query>, QueryNodeArgs, WithTypename<PermissionDomain> | WithTypename<Query> | string>,
-    permissionByRowId?: GraphCacheResolver<WithTypename<Query>, QueryPermissionByRowIdArgs, WithTypename<Permission> | string>,
+    node?: GraphCacheResolver<WithTypename<Query>, QueryNodeArgs, WithTypename<Permission> | WithTypename<PermissionDomain> | WithTypename<Query> | string>,
+    permission?: GraphCacheResolver<WithTypename<Query>, QueryPermissionArgs, WithTypename<Permission> | string>,
+    permissionById?: GraphCacheResolver<WithTypename<Query>, QueryPermissionByIdArgs, WithTypename<Permission> | string>,
     permissionDomain?: GraphCacheResolver<WithTypename<Query>, QueryPermissionDomainArgs, WithTypename<PermissionDomain> | string>,
     permissionDomainById?: GraphCacheResolver<WithTypename<Query>, QueryPermissionDomainByIdArgs, WithTypename<PermissionDomain> | string>,
     permissionDomainByName?: GraphCacheResolver<WithTypename<Query>, QueryPermissionDomainByNameArgs, WithTypename<PermissionDomain> | string>,
@@ -608,6 +674,7 @@ export type GraphCacheResolvers = {
     startCursor?: GraphCacheResolver<WithTypename<PageInfo>, Record<string, never>, Scalars['Cursor'] | string>
   },
   Permission?: {
+    id?: GraphCacheResolver<WithTypename<Permission>, Record<string, never>, Scalars['ID'] | string>,
     name?: GraphCacheResolver<WithTypename<Permission>, Record<string, never>, Scalars['String'] | string>,
     permissionDomain?: GraphCacheResolver<WithTypename<Permission>, Record<string, never>, WithTypename<PermissionDomain> | string>,
     permissionDomainId?: GraphCacheResolver<WithTypename<Permission>, Record<string, never>, Scalars['Int'] | string>,
@@ -651,22 +718,26 @@ export type GraphCacheResolvers = {
 export type GraphCacheOptimisticUpdaters = {
   createPermission?: GraphCacheOptimisticMutationResolver<MutationCreatePermissionArgs, Maybe<WithTypename<CreatePermissionPayload>>>,
   createPermissionDomain?: GraphCacheOptimisticMutationResolver<MutationCreatePermissionDomainArgs, Maybe<WithTypename<CreatePermissionDomainPayload>>>,
-  deletePermissionByRowId?: GraphCacheOptimisticMutationResolver<MutationDeletePermissionByRowIdArgs, Maybe<WithTypename<DeletePermissionPayload>>>,
+  deletePermission?: GraphCacheOptimisticMutationResolver<MutationDeletePermissionArgs, Maybe<WithTypename<DeletePermissionPayload>>>,
+  deletePermissionById?: GraphCacheOptimisticMutationResolver<MutationDeletePermissionByIdArgs, Maybe<WithTypename<DeletePermissionPayload>>>,
   deletePermissionDomain?: GraphCacheOptimisticMutationResolver<MutationDeletePermissionDomainArgs, Maybe<WithTypename<DeletePermissionDomainPayload>>>,
   deletePermissionDomainById?: GraphCacheOptimisticMutationResolver<MutationDeletePermissionDomainByIdArgs, Maybe<WithTypename<DeletePermissionDomainPayload>>>,
   deletePermissionDomainByName?: GraphCacheOptimisticMutationResolver<MutationDeletePermissionDomainByNameArgs, Maybe<WithTypename<DeletePermissionDomainPayload>>>,
-  updatePermissionByRowId?: GraphCacheOptimisticMutationResolver<MutationUpdatePermissionByRowIdArgs, Maybe<WithTypename<UpdatePermissionPayload>>>
+  updatePermission?: GraphCacheOptimisticMutationResolver<MutationUpdatePermissionArgs, Maybe<WithTypename<UpdatePermissionPayload>>>,
+  updatePermissionById?: GraphCacheOptimisticMutationResolver<MutationUpdatePermissionByIdArgs, Maybe<WithTypename<UpdatePermissionPayload>>>
 };
 
 export type GraphCacheUpdaters = {
   Mutation?: {
     createPermission?: GraphCacheUpdateResolver<{ createPermission: Maybe<WithTypename<CreatePermissionPayload>> }, MutationCreatePermissionArgs>,
     createPermissionDomain?: GraphCacheUpdateResolver<{ createPermissionDomain: Maybe<WithTypename<CreatePermissionDomainPayload>> }, MutationCreatePermissionDomainArgs>,
-    deletePermissionByRowId?: GraphCacheUpdateResolver<{ deletePermissionByRowId: Maybe<WithTypename<DeletePermissionPayload>> }, MutationDeletePermissionByRowIdArgs>,
+    deletePermission?: GraphCacheUpdateResolver<{ deletePermission: Maybe<WithTypename<DeletePermissionPayload>> }, MutationDeletePermissionArgs>,
+    deletePermissionById?: GraphCacheUpdateResolver<{ deletePermissionById: Maybe<WithTypename<DeletePermissionPayload>> }, MutationDeletePermissionByIdArgs>,
     deletePermissionDomain?: GraphCacheUpdateResolver<{ deletePermissionDomain: Maybe<WithTypename<DeletePermissionDomainPayload>> }, MutationDeletePermissionDomainArgs>,
     deletePermissionDomainById?: GraphCacheUpdateResolver<{ deletePermissionDomainById: Maybe<WithTypename<DeletePermissionDomainPayload>> }, MutationDeletePermissionDomainByIdArgs>,
     deletePermissionDomainByName?: GraphCacheUpdateResolver<{ deletePermissionDomainByName: Maybe<WithTypename<DeletePermissionDomainPayload>> }, MutationDeletePermissionDomainByNameArgs>,
-    updatePermissionByRowId?: GraphCacheUpdateResolver<{ updatePermissionByRowId: Maybe<WithTypename<UpdatePermissionPayload>> }, MutationUpdatePermissionByRowIdArgs>
+    updatePermission?: GraphCacheUpdateResolver<{ updatePermission: Maybe<WithTypename<UpdatePermissionPayload>> }, MutationUpdatePermissionArgs>,
+    updatePermissionById?: GraphCacheUpdateResolver<{ updatePermissionById: Maybe<WithTypename<UpdatePermissionPayload>> }, MutationUpdatePermissionByIdArgs>
   },
   Subscription?: {},
 };
