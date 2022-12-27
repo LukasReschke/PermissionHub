@@ -16,7 +16,6 @@ const documents = {
     "mutation AddNewPermissionDomain($data:CreatePermissionDomainInput!) {\n    createPermissionDomain(input:$data) {\n      permissionDomain {\n        id\n        name\n      }\n    }\n}": types.AddNewPermissionDomainDocument,
     "\nquery FetchAllPermissionDomains {\n    permissionDomains {\n      nodes {\n        id\n        name\n      }\n    }\n  }\n": types.FetchAllPermissionDomainsDocument,
     "\nmutation DeletePermissionDomainByIdMutation($id: ID!) {\n    deletePermissionDomainById(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n": types.DeletePermissionDomainByIdMutationDocument,
-    "query FetchPermissionDomainInfosById($id: ID!) {\n    node(id: $id) {\n      ... on PermissionDomain {\n        name\n        permissions {\n          nodes {\n            name\n          }\n        }\n      }\n    }\n  }\n": types.FetchPermissionDomainInfosByIdDocument,
 };
 
 /**
@@ -31,10 +30,6 @@ export function graphql(source: "\nquery FetchAllPermissionDomains {\n    permis
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\nmutation DeletePermissionDomainByIdMutation($id: ID!) {\n    deletePermissionDomainById(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n"): (typeof documents)["\nmutation DeletePermissionDomainByIdMutation($id: ID!) {\n    deletePermissionDomainById(input: {id: $id}) {\n      permissionDomain {\n        __typename\n        id\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "query FetchPermissionDomainInfosById($id: ID!) {\n    node(id: $id) {\n      ... on PermissionDomain {\n        name\n        permissions {\n          nodes {\n            name\n          }\n        }\n      }\n    }\n  }\n"): (typeof documents)["query FetchPermissionDomainInfosById($id: ID!) {\n    node(id: $id) {\n      ... on PermissionDomain {\n        name\n        permissions {\n          nodes {\n            name\n          }\n        }\n      }\n    }\n  }\n"];
 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
