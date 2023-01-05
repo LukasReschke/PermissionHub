@@ -15,6 +15,7 @@ app.use(
       setofFunctionsContainNulls: false,
       ownerConnectionString: "postgres://postgres:password@db:5432/postgres",
       ignoreRBAC: false,
+      externalGraphqlRoute: "/api/graphql",
       pgDefaultRole: "permissionhub_admin",
       showErrorStack: "json",
       extendedErrors: ["hint", "detail", "errcode"],

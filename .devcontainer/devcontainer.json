@@ -8,11 +8,8 @@
         "github.copilot"
     ],
     "portsAttributes": {
-        "3000": {
-            "label": "Client"
-        },
-        "3001": {
-            "label": "Server"
+        "3002": {
+            "label": "PermissionHub"
         },
         "8080": {
             "label": "pgAdmin"
