@@ -15,7 +15,7 @@ const root = ReactDOM.createRoot(
 );
 
 const client = createClient({
-  url: 'http://localhost:3001/graphql',
+  url: process.env.REACT_APP_GRAPHQL_ENDPOINT!,
   exchanges: [
     dedupExchange,
     cacheExchange<GraphCacheConfig>(
