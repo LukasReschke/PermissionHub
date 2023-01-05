@@ -49,6 +49,8 @@ services:
       - PGADMIN_LISTEN_PORT=8080
       - PGADMIN_DEFAULT_EMAIL=lukas@statuscode.ch
       - PGADMIN_DEFAULT_PASSWORD=password
+      - PGADMIN_CONFIG_PROXY_X_HOST_COUNT=1
+      - PGADMIN_CONFIG_PROXY_X_PREFIX_COUNT=1
 
 volumes:
   db-volume:
