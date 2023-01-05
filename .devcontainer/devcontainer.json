@@ -6,5 +6,16 @@
     "extensions": [
         "ms-azuretools.vscode-docker",
         "github.copilot"
-    ]
+	],
+	"portsAttributes": {
+		"3000": {
+			"label": "Client"
+		},
+		"3001": {
+			"label": "Server"
+		},
+		"8080": {
+			"label": "pgAdmin"
+		}
+	}
 }
