@@ -20,7 +20,7 @@ services:
       - "127.0.0.1:9757:9757"
     depends_on:
       - db
-    command: sleep infinity
+    command: nginx -c /workspaces/PermissionHub/reverseproxy/nginx.conf && sleep infinity
 
   db:
     image: postgres:12
